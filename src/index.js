@@ -1,7 +1,16 @@
 const mongoose = require("mongoose");
-const app = require("./app");
+const server = require("./app");
 const config = require("./config/config");
 
-let server;
+mongoose.connect(config.mongoose.url, config.mongoose.options)
+    .then(() => {
+        console.log('Connected to Mongodb')
+    }).catch((err) => {
+        console.log(`MongoDB connection error: ${err}`);
+    })
 
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Create Mongo connection and get the express app to listen on config.port
+server.listen(config.port, () => {
+    console.log(`Server started on port ${config.port}`);
+});
+
+module.exports = server;

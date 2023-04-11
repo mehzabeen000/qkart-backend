@@ -12,9 +12,24 @@ const userSchema = mongoose.Schema(
       trim: true,
     },
     email: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      lowercase: true,
+      validate(value) {
+        const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        if (!emailRegex.test(value)) {
+          throw new Error(
+            `${props.value} is not a valid email address!`
+          );
+        }
+      }
     },
     password: {
       type: String,
+      required: true,
+      trim: true,
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
@@ -24,6 +39,9 @@ const userSchema = mongoose.Schema(
       },
     },
     walletMoney: {
+      type: Number,
+      required: true,
+      default: config.default_wallet_money
     },
     address: {
       type: String,
@@ -43,9 +61,9 @@ const userSchema = mongoose.Schema(
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
+  const user = await User.findOne({ email });
+  return !!user;
 };
-
-
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*
@@ -56,3 +74,6 @@ userSchema.statics.isEmailTaken = async function (email) {
 /**
  * @typedef User
  */
+
+const User = mongoose.model('User', userSchema, 'users');
+module.exports = { User };

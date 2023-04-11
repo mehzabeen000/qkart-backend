@@ -1,4 +1,5 @@
 const { User } = require("../models");
+// const User = require("../models/user.model");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcryptjs");
@@ -10,6 +11,18 @@ const bcrypt = require("bcryptjs");
  * @param {String} id
  * @returns {Promise<User>}
  */
+const getUserById = async (id) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+        }
+        return user;
+    } catch (error) {
+        console.log(error)
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid user id');
+    }
+};
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
 /**
@@ -18,6 +31,17 @@ const bcrypt = require("bcryptjs");
  * @param {string} email
  * @returns {Promise<User>}
  */
+const getUserByEmail = async (email) => {
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+        }
+        return user;
+    } catch (error) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid email');
+    }
+};
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
 /**
@@ -41,5 +65,21 @@ const bcrypt = require("bcryptjs");
  *
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
+ const createUser = async (userBody) => {
+    try {
+        if(await User.isEmailTaken(userBody.email)) {
+            throw new ApiError(httpStatus.OK, 'Email already taken')
+        }
+        const user = await User.create(userBody);
+        return user;
+    } catch (error) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid data');
+    }
+};
 
+module.exports = { 
+    getUserByEmail,
+    getUserById,
+    createUser
+}
 
