@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const config = require("../config/config");
 
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -65,7 +64,16 @@ userSchema.statics.isEmailTaken = async function (email) {
   return !!user;
 };
 
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
+/**
+ * Check if entered password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+};
+
+
+
 /*
  * Create a Mongoose model out of userSchema and export the model as "User"
  * Note: The model should be accessible in a different module when imported like below

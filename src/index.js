@@ -14,3 +14,8 @@ server.listen(config.port, () => {
 });
 
 module.exports = server;
+// const app = require("./app");
+// const config = require("./config/config");
+
+// let server;
+
