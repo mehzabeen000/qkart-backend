@@ -3,10 +3,13 @@ const ApiError = require("../utils/ApiError");
 const catchAsync = require("../utils/catchAsync");
 const { userService } = require("../services");
 
+// TODO: CRIO_TASK_MODULE_CART - Update function to process url with query params
 /**
  * Get user details
  *  - Use service layer to get User data
  * 
+ *  - If query param, "q" equals "address", return only the address field of the user
+ *  - Else,
  *  - Return the whole user object fetched from Mongo
 
  *  - If data exists for the provided "userId", return 200 status code and the object

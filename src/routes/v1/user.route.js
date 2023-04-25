@@ -7,4 +7,13 @@ const router = express.Router();
 
 router.get('/:userId', auth, validate(userValidation.getUser), userController.getUser)
 
+
+
+router.put(
+  "/:userId",
+  auth,
+  validate(userValidation.setAddress),
+  userController.setAddress
+);
+
 module.exports = router;
