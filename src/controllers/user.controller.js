@@ -43,6 +43,11 @@ const { userService } = require("../services");
  */
 const getUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
+  // const user = await userService.getUserById(userId);
+  // console.log(req)
+  if (req.user._id.toString() !== userId) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden')
+  }
   const user = await userService.getUserById(userId);
   if(!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')

@@ -13,6 +13,16 @@ const ApiError = require("../utils/ApiError");
  * --- resolve the promise
  */
 const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
+  try {
+    if (err || info || !user) {
+      const error = new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
+      return reject(error);
+    }
+    req.user = user;
+    return resolve(user);
+  } catch (error) {
+    return reject(error);
+  }
 };
 
 /**
@@ -28,7 +38,8 @@ const auth = async (req, res, next) => {
     )(req, res, next);
   })
     .then(() => next())
-    .catch((err) => next(err));
+    .catch((err) => next(err))
 };
+
 
 module.exports = auth;

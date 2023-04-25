@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 // NOTE - "validator" external library and not the custom middleware at src/middlewares/validate.js
 const validator = require("validator");
+const bcrypt = require('bcrypt');
 const config = require("../config/config");
 
 const userSchema = mongoose.Schema(
@@ -64,12 +65,38 @@ userSchema.statics.isEmailTaken = async function (email) {
   return !!user;
 };
 
+userSchema.pre("save", function (next) {
+  var user = this;
+  if (!user.isModified('password')) return next();
+  // generate a salt
+
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) return next(err);
+    // hash the password using our new salt
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) return next(err);
+      // override the cleartext password with the hashed one
+      user.password = hash;
+      next();
+    });
+  });
+});
+
+userSchema.methods.comparePassword = function (candidatePassword, cb) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) return cb(err);
+    cb(null, isMatch);
+  });
+};
+
 /**
  * Check if entered password matches the user's password
  * @param {string} password
  * @returns {Promise<boolean>}
  */
 userSchema.methods.isPasswordMatch = async function (password) {
+  const match = await bcrypt.compare(password, this.password)
+  return match;
 };
 
 

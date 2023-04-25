@@ -32,9 +32,9 @@ const getUserById = async (id) => {
 const getUserByEmail = async (email) => {
     try {
         const user = await User.findOne({ email });
-        if (!user) {
-            throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-        }
+        // if (!user) {
+        // throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+        // }
         return user;
     } catch (error) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid email');
@@ -63,19 +63,20 @@ const getUserByEmail = async (email) => {
  *
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
- const createUser = async (userBody) => {
+const createUser = async (userBody) => {
     try {
-        if(await User.isEmailTaken(userBody.email)) {
-            throw new ApiError(httpStatus.OK, 'Email already taken')
-        }
-        const user = await User.create(userBody);
-        return user;
+        const doesExist = await User.isEmailTaken(userBody.email);
+        if (!doesExist) return await User.create(userBody);
+        else throw new ApiError(httpStatus.OK, 'Email already taken');
     } catch (error) {
+        if (error.message === 'Email already taken') {
+            throw new ApiError(httpStatus.OK, 'Email already taken');
+        }
         throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid data');
     }
 };
 
-module.exports = { 
+module.exports = {
     getUserByEmail,
     getUserById,
     createUser
