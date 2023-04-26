@@ -10,16 +10,15 @@ const bcrypt = require("bcryptjs");
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-    try {
-        const user = await User.findById(id);
-        if (!user) {
-            throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-        }
-        return user;
-    } catch (error) {
-        console.log(error)
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid user id');
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
+    return user;
+  } catch (error) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user id");
+  }
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
@@ -30,15 +29,12 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-    try {
-        const user = await User.findOne({ email });
-        // if (!user) {
-        // throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-        // }
-        return user;
-    } catch (error) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid email');
-    }
+  try {
+    const user = await User.findOne({ email });
+    return user;
+  } catch (error) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid email");
+  }
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
@@ -64,21 +60,46 @@ const getUserByEmail = async (email) => {
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
 const createUser = async (userBody) => {
-    try {
-        const doesExist = await User.isEmailTaken(userBody.email);
-        if (!doesExist) return await User.create(userBody);
-        else throw new ApiError(httpStatus.OK, 'Email already taken');
-    } catch (error) {
-        if (error.message === 'Email already taken') {
-            throw new ApiError(httpStatus.OK, 'Email already taken');
-        }
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid data');
-    }
+  // try {
+  const doesExist = await User.isEmailTaken(userBody.email);
+  if (!doesExist) return await User.create(userBody);
+  else throw new ApiError(httpStatus.OK, "Email already taken");
+  // } catch (error) {
+  //     if (error.message === 'Email already taken') {
+  //         throw new ApiError(httpStatus.OK, 'Email already taken');
+  //     }
+  //     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid data');
+  // }
+};
+
+// TODO: CRIO_TASK_MODULE_CART - Implement getUserAddressById()
+/**
+ * Get subset of user's data by id
+ * - Should fetch from Mongo only the email and address fields for the user apart from the id
+ *
+ * @param {ObjectId} id
+ * @returns {Promise<User>}
+ */
+const getUserAddressById = async (id) => {
+  const user = await User.findOne({ _id: id }, { email:1, address: 1 });
+  return user
+};
+
+/**
+ * Set user's shipping address
+ * @param {String} email
+ * @returns {String}
+ */
+const setAddress = async (user, newAddress) => {
+  user.address = newAddress;
+  await user.save();
+  return user.address;
 };
 
 module.exports = {
-    getUserByEmail,
-    getUserById,
-    createUser
-}
-
+  setAddress,
+  getUserAddressById,
+  getUserByEmail,
+  getUserById,
+  createUser,
+};

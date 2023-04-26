@@ -5,6 +5,28 @@ const config = require("../config/config")
 // TODO: CRIO_TASK_MODULE_CART - Complete cartSchema, a Mongoose schema for "carts" collection
 const cartSchema = mongoose.Schema(
   {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    cartItems:
+      [{
+        product: {
+          type: productSchema,
+          ref: 'Product',
+          required: true
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          default: 1
+        }
+      }],
+    paymentOption: {
+      type: String,
+      default: config.default_payment_option
+    }
   },
   {
     timestamps: false,

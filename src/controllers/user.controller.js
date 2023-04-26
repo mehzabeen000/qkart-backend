@@ -35,6 +35,12 @@ const { userService } = require("../services");
  *     "__v": 0
  * }
  * 
+ * Request url - <workspace-ip>:8082/v1/users/6010008e6c3477697e8eaba3?q=address
+ * Response - 
+ * {
+ *   "address": "ADDRESS_NOT_SET"
+ * }
+ * 
  *
  * Example response status codes:
  * HTTP 200 - If request successfully completes
@@ -44,21 +50,49 @@ const { userService } = require("../services");
  * @returns {User | {address: String}}
  *
  */
+
+const setAddress = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (user.email != req.user.email) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "User not authorized to access this resource"
+    );
+  }
+
+  const address = await userService.setAddress(user, req.body.address);
+
+  res.send({
+    address: address,
+  });
+});
+
 const getUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  // const user = await userService.getUserById(userId);
-  // console.log(req)
+  const q = req.query.q;
+
   if (req.user._id.toString() !== userId) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden')
   }
+
   const user = await userService.getUserById(userId);
-  if(!user) {
+  if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
-  res.send(user);
-});
 
+  if (q === 'address') {
+    res.send({ address: user.address });
+  } else {
+    res.send(user);
+  }
+});
 
 module.exports = {
   getUser,
+  setAddress,
 };
+
