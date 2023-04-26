@@ -106,6 +106,7 @@ describe("Cart routes", () => {
       const userCart = await getCartByUser(userOne);
       expect(userCart).toBeTruthy();
       expect(userCart.cartItems.length).toBe(0);
+y
     });
   });
 });
