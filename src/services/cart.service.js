@@ -2,6 +2,8 @@ const httpStatus = require("http-status");
 const { Cart, Product } = require("../models");
 const ApiError = require("../utils/ApiError");
 const config = require("../config/config");
+const { getProducts } = require("./product.service");
+const { getUserById } = require("./user.service");
 
 // TODO: CRIO_TASK_MODULE_CART - Implement the Cart service methods
 
@@ -183,9 +185,58 @@ const deleteProductFromCart = async (user, productId) => {
   return cart;
 };
 
+// TODO: CRIO_TASK_MODULE_TEST - Implement checkout function
+/**
+ * Checkout a users cart.
+ * On success, users cart must have no products.
+ *
+ * @param {User} user
+ * @returns {Promise}
+ * @throws {ApiError} when cart is invalid
+ */
+const checkout = async (user) => {
+  const cart = await Cart.findOne({email:user.email})
+
+  if(cart == null){
+    throw new ApiError(httpStatus.NOT_FOUND,"User does not have  cart")
+  }
+  if (cart.cartItems.length === 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Add item in the cart");
+  }
+  // if (user.address === config.default_address) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, "Address is not set");
+  // }
+  const hasSetNonDefaultAddress = await user.hasSetNonDefaultAddress()
+  if(!hasSetNonDefaultAddress){
+    throw new ApiError(httpStatus.BAD_REQUEST,"Address Not Set");
+  }
+
+  if (!user.walletMoney) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Not enough money");
+  }
+  
+  const total = cart.cartItems.reduce((acc,item)=>{
+    acc += (item.product.cost*item.quantity);
+    return acc;
+  },0)
+
+  if(total > user.walletMoney){
+    throw new ApiError(httpStatus.BAD_REQUEST,"Insufficient Balance")
+  }
+
+  //reduce the balance from the wallet
+  user.walletMoney -= total;
+  await user.save();
+
+  //empty the cart
+  cart.cartItems = [];
+  await cart.save();
+};
+
 module.exports = {
   getCartByUser,
   addProductToCart,
   updateProductInCart,
   deleteProductFromCart,
+  checkout,
 };

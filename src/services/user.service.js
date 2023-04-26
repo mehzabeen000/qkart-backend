@@ -10,15 +10,16 @@ const bcrypt = require("bcryptjs");
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  try {
+  // try {
     const user = await User.findById(id);
+    // console.log(user);
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
     return user;
-  } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user id");
-  }
+  // } catch (error) {
+    // throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user id");
+  // }
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
