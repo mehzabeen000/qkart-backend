@@ -1,3 +1,4 @@
 # Setup file template to upload data to MongoDB Atlas
-mongoimport --uri <add-url-connection-string-here> --drop --collection users --file data/export_qkart_users.json
-mongoimport --uri <add-url-connection-string-here> --drop --collection products --file data/export_qkart_products.json
+# mongo 
+mongoimport --uri "mongodb://ac-flyigcp-shard-00-00.uhlt4eh.mongodb.net:27017,ac-flyigcp-shard-00-01.uhlt4eh.mongodb.net:27017,ac-flyigcp-shard-00-02.uhlt4eh.mongodb.net:27017/qkart?replicaSet=atlas-yyvlck-shard-0" --ssl --authenticationDatabase admin --username mehzabeen1526 --password RC4rdhDjO2OECz3V --drop --collection users --file data/export_qkart_users.json
+mongoimport --uri "mongodb://ac-flyigcp-shard-00-00.uhlt4eh.mongodb.net:27017,ac-flyigcp-shard-00-01.uhlt4eh.mongodb.net:27017,ac-flyigcp-shard-00-02.uhlt4eh.mongodb.net:27017/qkart?replicaSet=atlas-yyvlck-shard-0" --ssl --authenticationDatabase admin --username mehzabeen1526 --password RC4rdhDjO2OECz3V --drop --collection products --file data/export_qkart_products.json
